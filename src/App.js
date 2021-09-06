@@ -1,25 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import styled from "styled-components";
+import GameContent from "./components/GameContent";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <WhacAMole>
+      <GameContent />
+    </WhacAMole>
   );
 }
 
 export default App;
+
+const WhacAMole = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  height: auto;
+  width: 100%;
+  background: radial-gradient(#9cffbb, #08a83b);
+`;
