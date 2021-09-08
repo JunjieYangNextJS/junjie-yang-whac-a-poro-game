@@ -1,53 +1,58 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { SiAiqfome } from "react-icons/si";
-import { SiApachespark } from "react-icons/si";
-import { SiAngellist } from "react-icons/si";
+import { BsClockHistory } from "react-icons/bs";
 
-export const GameUpdate = ({ setStartGame, score }) => {
+export const GameUpdate = ({ handleStart, startGame, score, timer }) => {
   const [highestRecord, setHighestRecord] = useState(0);
 
   const [congratsMessage, setCongratsMessage] = useState(false);
 
-  const handleStart = () => {
-    setStartGame(true);
-  };
-  //   useEffect(() => {
-  //     if (correct.length === 12 && correctRate > highestRecord) {
-  //       setHighestRecord(correctRate);
-  //       setCongratsMessage(true);
-  //     }
-  //   }, [correct]);
+  useEffect(() => {
+    if (!startGame) {
+      if (score > highestRecord) {
+        setHighestRecord(score);
+        setCongratsMessage("Congratulations! You just set a new record");
+      }
+      if (score <= highestRecord && highestRecord !== 0) {
+        setCongratsMessage("Unlucky! You will do better next time");
+      }
+    } else {
+      setCongratsMessage(false);
+    }
+  }, [startGame]);
 
   return (
     <GameUpdateContainer>
       <GameUpdaters>
         <UpperDiv>
           <ScoreWrapper>
-            <SiAiqfome />
+            <IconWrapper>
+              <SiAiqfome />
+            </IconWrapper>
             Score: {score}
           </ScoreWrapper>
-          <CorrectCountWrapper>
-            <SiApachespark />
-            Pairs
-          </CorrectCountWrapper>
-          <CorrectRateWrapper>
-            <SiAngellist />
-            Success Rate
-          </CorrectRateWrapper>
+          <TimeLeftWrapper timer={timer}>
+            <IconWrapper>
+              <BsClockHistory />
+            </IconWrapper>
+            Time Left: {timer}s
+          </TimeLeftWrapper>
         </UpperDiv>
 
         <ButtomDiv>
           <CongratsMessageWrapper congratsMessage={congratsMessage}>
-            Congratulations! You just set a new record !
+            {congratsMessage}!
           </CongratsMessageWrapper>
 
           <HighestRecordWrapper>
-            Your highest Score is now {score} points!
+            Your highest Score is now {highestRecord} points!
           </HighestRecordWrapper>
         </ButtomDiv>
       </GameUpdaters>
-      <PlayAgainWrapper onClick={handleStart}>Play</PlayAgainWrapper>
+      <PlayAgainWrapper onClick={startGame ? undefined : handleStart}>
+        {highestRecord === 0 ? "Play" : "Play Again"}
+      </PlayAgainWrapper>
     </GameUpdateContainer>
   );
 };
@@ -82,14 +87,12 @@ const ScoreWrapper = styled.div`
   gap: 10px;
 `;
 
-const CorrectCountWrapper = styled.div`
-  display: flex;
-  gap: 10px;
-`;
+const IconWrapper = styled.span``;
 
-const CorrectRateWrapper = styled.div`
+const TimeLeftWrapper = styled.div`
   display: flex;
   gap: 10px;
+  color: ${({ timer }) => (timer === 0 ? "red" : "yellow")};
 `;
 
 const ButtomDiv = styled.div``;

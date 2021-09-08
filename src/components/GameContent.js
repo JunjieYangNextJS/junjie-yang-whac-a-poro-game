@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { GameUpdate } from "./GameUpdate";
 import GoodPoro from "../images/GoodPoro.jpg";
 import EvilPoro from "../images/EvilPoro.png";
@@ -11,71 +11,60 @@ export default function GameContent() {
 
   const [startGame, setStartGame] = useState(false);
 
-  const [goodPoroPosition, setGoodPoroPosition] = useState(0);
+  const [goodPoroPosition, setGoodPoroPosition] = useState("");
 
-  const [evilPoroPosition, setEvilPoroPosition] = useState(0);
+  const [evilPoroPosition, setEvilPoroPosition] = useState("");
 
-  const [teamPorosPosition, setTeamPorosPosition] = useState(0);
+  const [teamPorosPosition, setTeamPorosPosition] = useState("");
 
   const [score, setScore] = useState(0);
 
-  function handleRandomCell() {
-    // return cells[Math.floor(Math.random() * 9)];
-    // let filteredCells = cells.filter(
-    //   (cell) =>
-    //     cell !== goodPoroPosition &&
-    //     cell !== evilPoroPosition &&
-    //     cell !== teamPorosPosition
-    // );
+  const [timer, setTimer] = useState(30);
 
-    // console.log("filteredCells", filteredCells.length);
-
-    return cells[Math.floor(Math.random() * cells.length)];
-  }
-
-  console.log(goodPoroPosition, "Good Poro");
-  // console.log(evilPoroPosition, "Evil Poro");
-  // console.log(teamPorosPosition, "Team Poros");
+  const handleStart = () => {
+    setStartGame(true);
+    setTimer(30);
+    setScore(0);
+  };
 
   useEffect(() => {
     if (!startGame) return;
-    let timerGoodPoro = setInterval(() => {
-      setGoodPoroPosition(
-        // (goodPoroPosition === "" ||
-        //   (goodPoroPosition !== evilPoroPosition) !== teamPorosPosition) &&
-        //   handleRandomCell()
+    if (timer > 0) {
+      setTimeout(() => setTimer(timer - 1), 1000);
+    } else {
+      setTimeout(() => setStartGame(false), 700);
+    }
+  }, [startGame, timer]);
 
-        handleRandomCell()
-      );
-    }, 1000);
+  function handleRandomCell() {
+    return cells[Math.floor(Math.random() * cells.length)];
+  }
 
-    console.log(
-      goodPoroPosition,
-      evilPoroPosition,
-      teamPorosPosition,
-      "please"
-    );
+  useEffect(() => {
+    let GoodPoroInterval = null;
+    let EvilPoroInterval = null;
+    let TeamPorosInterval = null;
+    if (startGame) {
+      GoodPoroInterval = setInterval(() => {
+        setGoodPoroPosition(handleRandomCell());
+      }, 1000);
 
-    let timerEvilPoro = setInterval(() => {
-      setEvilPoroPosition(
-        // (evilPoroPosition === "" ||
-        //   (evilPoroPosition !== goodPoroPosition) !== teamPorosPosition) &&
-        //   handleRandomCell()
+      EvilPoroInterval = setInterval(() => {
+        setEvilPoroPosition(handleRandomCell());
+      }, 5000);
 
-        handleRandomCell()
-      );
-    }, 5000);
-
-    let timerTeamPoros = setInterval(() => {
-      setTeamPorosPosition(
-        // (teamPorosPosition === "" ||
-        //   (teamPorosPosition !== goodPoroPosition) !== evilPoroPosition) &&
-        //   handleRandomCell()
-        handleRandomCell()
-      );
-    }, 7000);
-
-    // clearInterval(timerId)
+      TeamPorosInterval = setInterval(() => {
+        setTeamPorosPosition(handleRandomCell());
+      }, 7000);
+    }
+    return () => {
+      setGoodPoroPosition("");
+      setEvilPoroPosition("");
+      setTeamPorosPosition("");
+      clearInterval(GoodPoroInterval);
+      clearInterval(EvilPoroInterval);
+      clearInterval(TeamPorosInterval);
+    };
   }, [startGame]);
 
   useEffect(() => {
@@ -106,14 +95,15 @@ export default function GameContent() {
     return;
   };
 
-  console.log("Score", score);
-
   return (
     <GameContentContainer>
       <CellsContainer>
         {cells.map((cell, index) => (
           <CellWrapper key={index}>
-            {(goodPoroPosition || evilPoroPosition || teamPorosPosition) && (
+            {(goodPoroPosition ||
+              evilPoroPosition ||
+              teamPorosPosition ||
+              goodPoroPosition === "") && (
               <ImageWrapper
                 src={
                   (goodPoroPosition === cell && GoodPoro) ||
@@ -122,6 +112,7 @@ export default function GameContent() {
                   Cardback
                 }
                 alt="Poro"
+                draggable="false"
                 onClick={() => handleScore(cell)}
                 location={cell}
                 goodPoroPosition={goodPoroPosition}
@@ -132,7 +123,12 @@ export default function GameContent() {
           </CellWrapper>
         ))}
       </CellsContainer>
-      <GameUpdate setStartGame={setStartGame} score={score} />
+      <GameUpdate
+        handleStart={handleStart}
+        startGame={startGame}
+        score={score}
+        timer={timer}
+      />
     </GameContentContainer>
   );
 }
@@ -156,6 +152,14 @@ const CellsContainer = styled.div`
   padding-top: 60px;
   padding-bottom: 8vh;
   gap: 20px;
+
+  @media all and (max-width: 768px) {
+    width: 300px;
+  }
+
+  @media all and (max-width: 500px) {
+    gap: 8px;
+  }
 `;
 
 const CellWrapper = styled.div`
@@ -163,13 +167,32 @@ const CellWrapper = styled.div`
   position: relative;
   height: 200px;
   width: 200px;
-
-  background-color: #fff;
   border-radius: 10px;
+
+  @media all and (max-width: 768px) {
+    width: 150px;
+    height: 150px;
+  }
+
+  @media all and (max-width: 500px) {
+    width: 100px;
+    height: 100px;
+  }
 `;
 
 const ImageWrapper = styled.img`
   width: 100%;
   height: 100%;
   border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 0 20px 2px white;
+
+  box-shadow: ${({ teamPorosPosition, location }) =>
+    teamPorosPosition === location ? "0 0 20px 5px #ff5eb9" : "default"};
+
+  box-shadow: ${({ evilPoroPosition, location }) =>
+    evilPoroPosition === location ? "0 0 20px 5px black" : "default"};
+
+  box-shadow: ${({ goodPoroPosition, location }) =>
+    goodPoroPosition === location ? "0 0 20px 2px #0f8bff" : "default"};
 `;
