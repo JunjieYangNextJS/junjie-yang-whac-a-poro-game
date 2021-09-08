@@ -6,19 +6,20 @@ import { BsClockHistory } from "react-icons/bs";
 export const GameUpdate = ({ handleStart, startGame, score, timer }) => {
   const [highestRecord, setHighestRecord] = useState(0);
 
-  const [congratsMessage, setCongratsMessage] = useState(false);
+  const [message, setMessage] = useState(false);
 
+  // sends a congratulating or motivating message to the user after they finish the game depending on the scoring.
   useEffect(() => {
     if (!startGame) {
       if (score > highestRecord) {
         setHighestRecord(score);
-        setCongratsMessage("Congratulations! You just set a new record");
+        setMessage("Congratulations! You just set a new record");
       }
       if (score <= highestRecord && highestRecord !== 0) {
-        setCongratsMessage("Unlucky! You will do better next time");
+        setMessage("Unlucky! You will do better next time");
       }
     } else {
-      setCongratsMessage(false);
+      setMessage(false);
     }
   }, [startGame]);
 
@@ -41,9 +42,7 @@ export const GameUpdate = ({ handleStart, startGame, score, timer }) => {
         </UpperDiv>
 
         <ButtomDiv>
-          <CongratsMessageWrapper congratsMessage={congratsMessage}>
-            {congratsMessage}!
-          </CongratsMessageWrapper>
+          <MessageWrapper message={message}>{message}!</MessageWrapper>
 
           <HighestRecordWrapper>
             Your highest Score is now {highestRecord} points!
@@ -97,9 +96,8 @@ const TimeLeftWrapper = styled.div`
 
 const ButtomDiv = styled.div``;
 
-const CongratsMessageWrapper = styled.div`
-  visibility: ${({ congratsMessage }) =>
-    congratsMessage ? "default" : "hidden"};
+const MessageWrapper = styled.div`
+  visibility: ${({ message }) => (message ? "default" : "hidden")};
 `;
 
 const HighestRecordWrapper = styled.div``;

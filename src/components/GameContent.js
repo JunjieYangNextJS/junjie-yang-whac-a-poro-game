@@ -21,12 +21,14 @@ export default function GameContent() {
 
   const [timer, setTimer] = useState(30);
 
+  // Starts the game and reset the timer and reset the score when user click the play button.
   const handleStart = () => {
     setStartGame(true);
     setTimer(30);
     setScore(0);
   };
 
+  // Countdown happens when the game starts.
   useEffect(() => {
     if (!startGame) return;
     if (timer > 0) {
@@ -36,10 +38,12 @@ export default function GameContent() {
     }
   }, [startGame, timer]);
 
+  // the function to be called each time the game wants poros to appear at a random cell.
   function handleRandomCell() {
     return cells[Math.floor(Math.random() * cells.length)];
   }
 
+  // defines the likelihood and frequency for different poros to appear at each second while the game is being played.
   useEffect(() => {
     let GoodPoroInterval = null;
     let EvilPoroInterval = null;
@@ -67,6 +71,7 @@ export default function GameContent() {
     };
   }, [startGame]);
 
+  // making sure EvilPoro and TeamPoros would only show up for 1s each time.
   useEffect(() => {
     setTimeout(() => {
       setEvilPoroPosition("");
@@ -79,6 +84,7 @@ export default function GameContent() {
     }, 1000);
   }, [teamPorosPosition]);
 
+  // defines scoring after poros are clicked.
   const handleScore = (clickedCell) => {
     if (clickedCell === goodPoroPosition) {
       setScore(score + 1);
@@ -123,6 +129,17 @@ export default function GameContent() {
           </CellWrapper>
         ))}
       </CellsContainer>
+      <ImageExplainer>
+        <ImageMeaning>
+          <img src={GoodPoro} alt="Cute Poro" /> +1
+        </ImageMeaning>
+        <ImageMeaning>
+          <img src={EvilPoro} alt="Evil Poro" /> -3
+        </ImageMeaning>
+        <ImageMeaning>
+          <img src={TeamPoros} alt="a team of Poros" /> +5
+        </ImageMeaning>
+      </ImageExplainer>
       <GameUpdate
         handleStart={handleStart}
         startGame={startGame}
@@ -150,7 +167,7 @@ const CellsContainer = styled.div`
   grid-template-rows: repeat(3, 1fr);
   width: 600px;
   padding-top: 60px;
-  padding-bottom: 8vh;
+  padding-bottom: 3vh;
   gap: 20px;
 
   @media all and (max-width: 768px) {
@@ -158,7 +175,7 @@ const CellsContainer = styled.div`
   }
 
   @media all and (max-width: 500px) {
-    gap: 8px;
+    gap: 7px;
   }
 `;
 
@@ -195,4 +212,24 @@ const ImageWrapper = styled.img`
 
   box-shadow: ${({ goodPoroPosition, location }) =>
     goodPoroPosition === location ? "0 0 20px 2px #0f8bff" : "default"};
+`;
+
+const ImageExplainer = styled.div`
+  display: flex;
+  width: 300px;
+  justify-content: space-between;
+  padding-bottom: 1vh;
+`;
+
+const ImageMeaning = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  gap: 3px;
+
+  img {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+  }
 `;
