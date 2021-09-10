@@ -1,27 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { SiAiqfome } from "react-icons/si";
 import { BsClockHistory } from "react-icons/bs";
 
 export const GameUpdate = ({ handleStart, startGame, score, timer }) => {
-  const [highestRecord, setHighestRecord] = useState(0);
-
   const [message, setMessage] = useState(false);
+
+  const highestRecord = useRef(0);
 
   // sends a congratulating or motivating message to the user after they finish the game depending on the scoring.
   useEffect(() => {
-    if (!startGame) {
-      if (score > highestRecord) {
-        setHighestRecord(score);
+    if (!startGame && timer === 0) {
+      if (score <= highestRecord.current) {
+        setMessage("Unlucky! You will do better next time");
+      } else {
+        highestRecord.current = score;
         setMessage("Congratulations! You just set a new record");
       }
-      if (score <= highestRecord && highestRecord !== 0) {
-        setMessage("Unlucky! You will do better next time");
-      }
-    } else {
-      setMessage(false);
-    }
-  }, [startGame]);
+    } else setMessage("");
+  }, [startGame, score, timer]);
 
   return (
     <GameUpdateContainer>
@@ -45,12 +42,12 @@ export const GameUpdate = ({ handleStart, startGame, score, timer }) => {
           <MessageWrapper message={message}>{message}!</MessageWrapper>
 
           <HighestRecordWrapper>
-            Your highest Score is now {highestRecord} points!
+            Your highest Score is now {highestRecord.current} points!
           </HighestRecordWrapper>
         </ButtomDiv>
       </GameUpdaters>
       <PlayAgainWrapper onClick={startGame ? undefined : handleStart}>
-        {highestRecord === 0 ? "Play" : "Play Again"}
+        {highestRecord.current === 0 ? "Play" : "Play Again"}
       </PlayAgainWrapper>
     </GameUpdateContainer>
   );

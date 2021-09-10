@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import React, { useState, useEffect, useRef } from "react";
+import styled, { css } from "styled-components";
 import { GameUpdate } from "./GameUpdate";
 import GoodPoro from "../images/GoodPoro.jpg";
 import EvilPoro from "../images/EvilPoro.png";
@@ -19,7 +19,11 @@ export default function GameContent() {
 
   const [score, setScore] = useState(0);
 
+  const [colorEffect, setColorEffect] = useState("");
+
   const [timer, setTimer] = useState(30);
+
+  const savedRandomCell = useRef();
 
   // Starts the game and reset the timer and reset the score when user click the play button.
   const handleStart = () => {
@@ -43,6 +47,8 @@ export default function GameContent() {
     return cells[Math.floor(Math.random() * cells.length)];
   }
 
+  savedRandomCell.current = handleRandomCell;
+
   // defines the likelihood and frequency for different poros to appear at each second while the game is being played.
   useEffect(() => {
     let GoodPoroInterval = null;
@@ -50,15 +56,15 @@ export default function GameContent() {
     let TeamPorosInterval = null;
     if (startGame) {
       GoodPoroInterval = setInterval(() => {
-        setGoodPoroPosition(handleRandomCell());
+        setGoodPoroPosition(savedRandomCell.current());
       }, 1000);
 
       EvilPoroInterval = setInterval(() => {
-        setEvilPoroPosition(handleRandomCell());
+        setEvilPoroPosition(savedRandomCell.current());
       }, 5000);
 
       TeamPorosInterval = setInterval(() => {
-        setTeamPorosPosition(handleRandomCell());
+        setTeamPorosPosition(savedRandomCell.current());
       }, 7000);
     }
     return () => {
@@ -71,31 +77,40 @@ export default function GameContent() {
     };
   }, [startGame]);
 
-  // making sure EvilPoro and TeamPoros would only show up for 1s each time.
+  // EvilPoro and TeamsPoro will show up in between 0.3s to 1.9s only to make the game spicy and more random.
   useEffect(() => {
     setTimeout(() => {
       setEvilPoroPosition("");
-    }, 1000);
-  }, [evilPoroPosition]);
-
-  useEffect(() => {
+    }, Math.floor(Math.random() * 1600 + 300));
     setTimeout(() => {
       setTeamPorosPosition("");
-    }, 1000);
-  }, [teamPorosPosition]);
+    }, Math.floor(Math.random() * 1600 + 300));
+  }, [evilPoroPosition, teamPorosPosition]);
 
-  // defines scoring after poros are clicked.
+  // defines scoring and scoring color effects after poros are clicked.
   const handleScore = (clickedCell) => {
     if (clickedCell === goodPoroPosition) {
       setScore(score + 1);
+      setColorEffect("+1");
+      setTimeout(() => {
+        setColorEffect("");
+      }, 500);
       setGoodPoroPosition("");
     }
     if (clickedCell === evilPoroPosition) {
       setScore(score - 3);
+      setColorEffect("-3");
+      setTimeout(() => {
+        setColorEffect("");
+      }, 500);
       setEvilPoroPosition("");
     }
     if (clickedCell === teamPorosPosition) {
       setScore(score + 5);
+      setColorEffect("+5");
+      setTimeout(() => {
+        setColorEffect("");
+      }, 500);
       setTeamPorosPosition("");
     }
     return;
@@ -130,13 +145,13 @@ export default function GameContent() {
         ))}
       </CellsContainer>
       <ImageExplainer>
-        <ImageMeaning>
+        <ImageMeaning meaning={"+1"} colorEffect={colorEffect}>
           <img src={GoodPoro} alt="Cute Poro" /> +1
         </ImageMeaning>
-        <ImageMeaning>
+        <ImageMeaning meaning={"-3"} colorEffect={colorEffect}>
           <img src={EvilPoro} alt="Evil Poro" /> -3
         </ImageMeaning>
-        <ImageMeaning>
+        <ImageMeaning meaning={"+5"} colorEffect={colorEffect}>
           <img src={TeamPoros} alt="a team of Poros" /> +5
         </ImageMeaning>
       </ImageExplainer>
@@ -226,6 +241,14 @@ const ImageMeaning = styled.div`
   align-items: center;
   font-size: 24px;
   gap: 3px;
+
+  ${({ colorEffect, meaning }) =>
+    colorEffect === meaning &&
+    css`
+      color: red;
+      font-size: 26px;
+      gap: 1px;
+    `}
 
   img {
     width: 50px;
