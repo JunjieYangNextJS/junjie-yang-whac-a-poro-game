@@ -77,14 +77,14 @@ export default function GameContent() {
     };
   }, [startGame]);
 
-  // EvilPoro and TeamsPoro will show up in between 0.3s to 1.9s only to make the game spicy and more random.
+  // EvilPoro and TeamsPoro will show up in between 0.5s to 1.9s only to make the game spicy and more random.
   useEffect(() => {
     setTimeout(() => {
       setEvilPoroPosition("");
-    }, Math.floor(Math.random() * 1600 + 300));
+    }, Math.floor(Math.random() * 1400 + 500));
     setTimeout(() => {
       setTeamPorosPosition("");
-    }, Math.floor(Math.random() * 1600 + 300));
+    }, Math.floor(Math.random() * 1400 + 500));
   }, [evilPoroPosition, teamPorosPosition]);
 
   // defines scoring and scoring color effects after poros are clicked.
