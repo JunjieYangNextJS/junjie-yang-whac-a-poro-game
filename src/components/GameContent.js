@@ -49,19 +49,19 @@ export default function GameContent() {
 
   savedRandomCell.current = handleRandomCell;
 
-  // defines the frequency for different poros to appear at each second while the game is being ongoing.
+  // defines the frequency and likelihood for different poros to appear at each second while the game is being ongoing.
   useEffect(() => {
     if (startGame && timer > 0) {
       if (timer % 1 === 0) {
         setGoodPoroPosition(savedRandomCell.current());
       }
-      if (timer % 5 === 1) {
+      if (timer % 4 === Math.floor(Math.random() * 5)) {
         setEvilPoroPosition(savedRandomCell.current());
       } else {
         setEvilPoroPosition("");
       }
 
-      if (timer % 7 === 1) {
+      if (timer % 7 === Math.floor(Math.random() * 5)) {
         setTeamPorosPosition(savedRandomCell.current());
       } else {
         setTeamPorosPosition("");
