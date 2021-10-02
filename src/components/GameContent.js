@@ -49,43 +49,29 @@ export default function GameContent() {
 
   savedRandomCell.current = handleRandomCell;
 
-  // defines the likelihood and frequency for different poros to appear at each second while the game is being played.
+  // defines the frequency for different poros to appear at each second while the game is being ongoing.
   useEffect(() => {
-    let GoodPoroInterval = null;
-    let EvilPoroInterval = null;
-    let TeamPorosInterval = null;
-    if (startGame) {
-      GoodPoroInterval = setInterval(() => {
+    if (startGame && timer > 0) {
+      if (timer % 1 === 0) {
         setGoodPoroPosition(savedRandomCell.current());
-      }, 1000);
-
-      EvilPoroInterval = setInterval(() => {
+      }
+      if (timer % 5 === 1) {
         setEvilPoroPosition(savedRandomCell.current());
-      }, 5000);
+      } else {
+        setEvilPoroPosition("");
+      }
 
-      TeamPorosInterval = setInterval(() => {
+      if (timer % 7 === 1) {
         setTeamPorosPosition(savedRandomCell.current());
-      }, 7000);
-    }
-    return () => {
+      } else {
+        setTeamPorosPosition("");
+      }
+    } else {
       setGoodPoroPosition("");
       setEvilPoroPosition("");
       setTeamPorosPosition("");
-      clearInterval(GoodPoroInterval);
-      clearInterval(EvilPoroInterval);
-      clearInterval(TeamPorosInterval);
-    };
-  }, [startGame]);
-
-  // EvilPoro and TeamsPoro will show up in between 0.5s to 1.9s only to make the game spicy and more random.
-  useEffect(() => {
-    setTimeout(() => {
-      setEvilPoroPosition("");
-    }, Math.floor(Math.random() * 1400 + 500));
-    setTimeout(() => {
-      setTeamPorosPosition("");
-    }, Math.floor(Math.random() * 1400 + 500));
-  }, [evilPoroPosition, teamPorosPosition]);
+    }
+  }, [startGame, timer]);
 
   // defines scoring and scoring color effects after poros are clicked.
   const handleScore = (clickedCell) => {
