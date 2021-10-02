@@ -23,8 +23,6 @@ export default function GameContent() {
 
   const [timer, setTimer] = useState(30);
 
-  const savedRandomCell = useRef();
-
   // Starts the game and reset the timer and reset the score when user click the play button.
   const handleStart = () => {
     setStartGame(true);
@@ -46,7 +44,7 @@ export default function GameContent() {
   function handleRandomCell() {
     return cells[Math.floor(Math.random() * cells.length)];
   }
-
+  const savedRandomCell = useRef();
   savedRandomCell.current = handleRandomCell;
 
   // defines the frequency and likelihood for different poros to appear at each second while the game is being ongoing.
